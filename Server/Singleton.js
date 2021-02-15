@@ -1,24 +1,42 @@
-
 // Some code need to be added here, that are common for the module
+const math = require('mathjs');
+
+// generate timer and sequence number values, and the cap value
+let timer = math.round(math.random() * (999-1) + 1);
+let seqNum = math.round(Math.random() * (999-1) + 1);
+let maxTime = math.pow(2, 32);
 
 module.exports = {
+    
     init: function() {
-       // init function needs to be implemented here //
+       
+        // function to update the timer
+        function updateTimer() 
+        {
+            if (time == maxTime) // check if max has been reached
+            {
+                time = 0; // reset the time
+            }
+            
+            time++; // increment timer
+        }
+
+        // set updateTimer to run every 10 miliseconds
+        setInterval(upateTimer, 10);
     },
 
-    //--------------------------
+    
     //getSequenceNumber: return the current sequence number + 1
-    //--------------------------
     getSequenceNumber: function() {
-      // Enter your code here //
-        return "this should be a correct sequence number";
+      
+        seqNum++; // increment sequence number
+        return seqNum;
     },
 
-    //--------------------------
     //getTimestamp: return the current timer value
-    //--------------------------
     getTimestamp: function() {
-        return "this should be a correct timestamp";
+
+        return timer;
     }
 
 

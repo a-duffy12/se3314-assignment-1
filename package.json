@@ -1,10 +1,12 @@
 {
-  "name": "enter the assignment name here",
+  "name": "aduffy22-SE3314b-assignment-1",
   "version": "1.0.0",
   "description": "",
-  "main": "../Client/GetImage.js",
+  "main": "../Server/ImageDB.js",
   "dependencies": {
-    "open": "^7.4.0"
+    "fs": "0.0.1-security",
+    "net": "^1.0.2",
+    "open": "^7.4.1"
   },
   "devDependencies": {},
   "author": "enter your name here",
