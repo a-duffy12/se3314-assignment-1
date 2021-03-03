@@ -13,16 +13,16 @@ module.exports = {
         // function to update the timer
         function updateTimer() 
         {
-            if (time == maxTime) // check if max has been reached
+            if (timer == maxTime) // check if max has been reached
             {
-                time = 0; // reset the time
+                timer = 0; // reset the time
             }
             
-            time++; // increment timer
+            timer++; // increment timer
         }
 
         // set updateTimer to run every 10 miliseconds
-        setInterval(upateTimer, 10);
+        setInterval(updateTimer, 10);
     },
 
     

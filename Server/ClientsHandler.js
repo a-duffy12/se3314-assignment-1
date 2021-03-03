@@ -38,6 +38,7 @@ module.exports = {
                 console.log(`   --Image File Name(s): ${name}`);
 
                 var resType = 0; // create query for response
+                var resCount = 0; // count how many are returned
 
                 // get requested images
                 fs.readdir('./images', (err, list) => {
@@ -47,6 +48,7 @@ module.exports = {
                         if (name == list[i])
                         {
                             resType = 1;
+                            resCount++;
                         }
                     }
 
@@ -55,7 +57,7 @@ module.exports = {
                     if (resType == 0) // image(s) not found
                     {
                         imageData = Buffer.alloc(1); // allocate bit
-                        ITPpacket.init(version, resType, currentSeq, currentTime, 0, imageData); // create a packet
+                        ITPpacket.init(version, resType, resCount, currentSeq, currentTime, 0, imageData); // create a packet
 
                         packet = ITPpacket.getPacket(); // build packet
                         sock.write(packet); // send packet

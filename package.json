@@ -5,6 +5,7 @@
   "main": "../Server/ImageDB.js",
   "dependencies": {
     "fs": "0.0.1-security",
+    "mathjs": "^9.2.0",
     "net": "^1.0.2",
     "open": "^7.4.1"
   },
