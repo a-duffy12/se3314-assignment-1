@@ -30,6 +30,11 @@ module.exports = {
     getPacket: function() {
         
         return packet;
+    },
+
+    getLength: function() {
+
+        return packet.length;
     }
 };
 
