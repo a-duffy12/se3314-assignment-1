@@ -98,12 +98,10 @@ module.exports = {
 
             if (!ok) // bad request
             {
-                var resData = "BAD ITP REQUEST";
-                let res = Buffer.from(resData);
+                imageData = Buffer.alloc(1); // allocate bit
+                ITPpacket.init(version, 0, 3, currentSeq, currentTime, 0, 0, res); // create a packet
 
-                ITPpacket.init(version, 0, 3, currentSeq, currentTime, 0, 0, res);
-
-                packet = ITPpacket.getPacket();
+                packet = ITPpacket.getPacket(); // build packet
                 sock.write(packet); // send packet
             }
             else // good request
@@ -133,15 +131,15 @@ module.exports = {
                     }
                     else if (resType == 1) // image(s) found
                     {
-                        fs.readFile("./images/" + fname, (err, con) => {
+                        fs.readFile("./images/" + fname, (err, res) => {
                         
                             if (err)
                             {
                                 throw err;
                             }
 
-                            let size = con.length;
-                            imageData = con;
+                            let size = res.length; // get size
+                            imageData = res;
 
                             ITPpacket.init(version, 1, resType, currentSeq, currentTime, ext, size, imageData); // create a packet
 

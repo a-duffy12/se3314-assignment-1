@@ -9,7 +9,7 @@ let type = Buffer.alloc(1);
 let seqNum = Buffer.alloc(4);
 let timestamp = Buffer.alloc(4);
 let ext = Buffer.alloc(4);
-let size = Buffer.alloc(2);
+let size = Buffer.alloc(4);
 
 module.exports = {
 
@@ -22,7 +22,14 @@ module.exports = {
         seqNum.writeInt16BE(sq);
         timestamp.writeInt16BE(ts);
         ext.writeInt16BE(e);
-        size.writeInt16BE(sz);
+        if (sz > 0xffff) // gif files make the size too big to read
+        {
+            size.writeInt32BE(0xffff);
+        }
+        else
+        {
+            size.writeInt32BE(sz);
+        }
         image = i;
 
         // create the packet
@@ -33,11 +40,6 @@ module.exports = {
     getPacket: function() {
         
         return packet;
-    },
-
-    getLength: function() {
-
-        return packet.length;
     }
 };
 

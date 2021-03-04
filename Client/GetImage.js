@@ -129,7 +129,7 @@ client.on('data', (res) => {
             extRaw = "raw"
         }
 
-        fs.writeFile(`received_${sq}.${extRaw}`, res.slice(19), (err) => {
+        fs.writeFile(`received_${sq}.${extRaw}`, res.slice(21), (err) => {
 
             if (err)
             {
