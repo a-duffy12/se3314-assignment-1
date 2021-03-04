@@ -3,9 +3,11 @@ const fs = require('fs');
 let ITPpacket = require('./ITPResponse');
 let singleton = require('./Singleton');
 
-
+// variables to track server properties
 let currentTime;
 let currentSeq;
+let extRaw = "";
+let fname = "";
 
 module.exports = {
 
@@ -27,12 +29,60 @@ module.exports = {
             // get information from packet
             var version = data.slice(0, 2).readUInt16BE(0);
             var type = data.slice(3).readUInt8(0).toString();
-            var name = data.slice(4).toString();
+            var ext = data.slice(4, 7).readUInt16BE(0);
+            var name = data.slice(8).toString();
+
+            // decode file type
+            if (ext == 1)
+            {
+                extRaw = "bmp";
+            }
+            else if (ext == 2)
+            {
+                extRaw = "jpg";
+            }
+            else if (ext == 3)
+            {
+                extRaw = "gif";
+            }
+            else if (ext == 4)
+            {
+                extRaw = "png";
+            }
+            else if (ext == 5)
+            {
+                extRaw = "tiff";
+            }
+            else if (ext == 12)
+            {
+                extRaw = "jpeg";
+            }
+            else if (ext == 15)
+            {
+                extRaw = "raw"
+            }
+            fname = name + "." + extRaw;
 
             console.log(`Client-${currentSeq} requests:`);
             console.log(`   --ITP Version: ${version}`);
-            console.log(`   --Request Type: ${type}`);
-            console.log(`   --Image Count:`);
+            //console.log(`   --Image Count:`); // TODO
+            if (type == 0)
+            {
+                console.log(`   --Request Type = Query`);
+            }
+            else if (type == 1)
+            {
+                console.log(`   --Request Type = Found`);
+            }
+            else if (type == 2)
+            {
+                console.log(`   --Request Type = Not Found`);
+            }
+            else if (type == 3)
+            {
+                console.log(`   --Request Type = Busy`);
+            }
+            console.log(`   --Image File Extension(s): ${extRaw.toUpperCase()}`);
             console.log(`   --Image File Name(s): ${name}\n`);
 
             var resType = 2; // create query for response
@@ -41,7 +91,7 @@ module.exports = {
             // check packet contents are ok
             var ok = false;
 
-            if (version == 7 && type == 0 && name != "")
+            if (version == 7 && type == 0 && fname !="")
             {
                 ok = true; // allow request
             }
@@ -51,7 +101,7 @@ module.exports = {
                 var resData = "BAD ITP REQUEST";
                 let res = Buffer.from(resData);
 
-                ITPpacket.init(version, 3, currentSeq, currentTime, 0, res);
+                ITPpacket.init(version, 0, 3, currentSeq, currentTime, 0, 0, res);
 
                 packet = ITPpacket.getPacket();
                 sock.write(packet); // send packet
@@ -63,28 +113,28 @@ module.exports = {
                 
                     for (let i = 0; i < list.length; i++)
                     {
-                        if (name == list[i])
+                        if (fname == list[i])
                         {
                             resType = 1;
                             resCount++;
                         }
                     }
-
+                
                     var imageData; // data for image
                     var packet; // packet to send
 
                     if (resType == 2) // image(s) not found
                     {
                         imageData = Buffer.alloc(1); // allocate bit
-                        ITPpacket.init(version, resType, resCount, currentSeq, currentTime, 0, imageData); // create a packet
+                        ITPpacket.init(version, 0, resType, currentSeq, currentTime, 0, 0, imageData); // create a packet
 
                         packet = ITPpacket.getPacket(); // build packet
                         sock.write(packet); // send packet
                     }
                     else if (resType == 1) // image(s) found
                     {
-                        fs.readFile("./images/" + name, (err, con) => {
-                            
+                        fs.readFile("./images/" + fname, (err, con) => {
+                        
                             if (err)
                             {
                                 throw err;
@@ -93,7 +143,7 @@ module.exports = {
                             let size = con.length;
                             imageData = con;
 
-                            ITPpacket.init(version, resType, currentSeq, currentTime, size, imageData); // create a packet
+                            ITPpacket.init(version, 1, resType, currentSeq, currentTime, ext, size, imageData); // create a packet
 
                             packet = ITPpacket.getPacket(); // build packet
                             sock.write(packet); // send packet
